@@ -8,28 +8,52 @@ namespace ServerMesa
 {
     public class MicrosoftWebSockets : WebSocketHandler
     {
-        private static WebSocketCollection mesas = new WebSocketCollection();
-        private static WebSocketCollection jogadores = new WebSocketCollection();
-        private int id;
+        private static WebSocketCollection clientes = new WebSocketCollection();
+        private int _id;
+        private string _tipo;
 
         public override void OnOpen()
         {
-            this.id = Convert.ToInt32(this.WebSocketContext.QueryString["id"]);
-            if (id == 1)
-                mesas.Add(this);
+            _tipo = Convert.ToString(WebSocketContext.QueryString["tipo"]);
+            if (_tipo == "MESA")
+            {
+                _id = 0;
+                clientes.Add(this);
+            }
             else
-                jogadores.Add(this);
+            {
+                _tipo = "JOGADOR";
+                _id = Convert.ToInt32(WebSocketContext.QueryString["id"]);
+                clientes.Add(this);
+                clientes.SingleOrDefault(r => ((MicrosoftWebSockets)r)._id == 0).Send(string.Format("J,NOVO,{0}", _id));
+            }
         }
 
         public override void OnMessage(string message)
         {
-            mesas.Broadcast(string.Format("{0} said: {1}", id, message));
+            string[] argumentos = message.Split(',');
+            switch(argumentos[0])
+            {
+                case "M":
+                    switch(argumentos[1])
+                    {
+                        case "TURNO":
+                            clientes.SingleOrDefault(r => ((MicrosoftWebSockets)r)._id == Convert.ToInt32(argumentos[2])).Send(message);
+                            break;
+                        default:
+                            clientes.Broadcast(message);
+                            break;
+                    }
+                    break;
+                case "J":
+                    clientes.SingleOrDefault(r => ((MicrosoftWebSockets)r)._id == 0).Send(message);
+                    break;
+            }
         }
 
         public override void OnClose()
         {
-            mesas.Remove(this);
-            mesas.Broadcast(string.Format("{0} has gone away.", id));
+            clientes.Remove(this);
         }
 
     }

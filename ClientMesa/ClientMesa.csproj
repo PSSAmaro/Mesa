@@ -98,9 +98,13 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Jogos\Galo.cs" />
+    <Compile Include="Jogos\Jogador.cs" />
+    <Compile Include="Jogos\Jogo.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Jogos\Peca.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -110,6 +114,12 @@
     <None Include="ClientMesa_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\empate.png" />
+    <Content Include="Assets\galo.png" />
+    <Content Include="Assets\o.png" />
+    <Content Include="Assets\preta.png" />
+    <Content Include="Assets\vermelha.png" />
+    <Content Include="Assets\x.png" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />

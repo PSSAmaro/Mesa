@@ -28,7 +28,7 @@
         window.onload = function () {
             wireEvents();
             var conversation = $('conversation');
-            var url = 'ws://servermesa.azurewebsites.net/ws.ashx?name=John Doe';
+            var url = 'ws://servermesa.azurewebsites.net/ws.ashx?tipo=MESA';
             ws = new WebSocket(url);
 
             ws.onerror = function (e) {
