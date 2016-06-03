@@ -17,6 +17,9 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <PackageCertificateKeyFile>ClientW10_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <AppxBundle>Always</AppxBundle>
+    <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -110,6 +113,19 @@
     <None Include="ClientW10_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\branco.png" />
+    <Content Include="Assets\galo.png" />
+    <Content Include="Assets\galo\0.png" />
+    <Content Include="Assets\galo\1.png" />
+    <Content Include="Assets\galo\2.png" />
+    <Content Include="Assets\galo\3.png" />
+    <Content Include="Assets\galo\4.png" />
+    <Content Include="Assets\galo\5.png" />
+    <Content Include="Assets\galo\6.png" />
+    <Content Include="Assets\galo\7.png" />
+    <Content Include="Assets\galo\8.png" />
+    <Content Include="Assets\o.png" />
+    <Content Include="Assets\x.png" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />

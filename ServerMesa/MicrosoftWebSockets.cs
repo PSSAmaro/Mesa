@@ -38,6 +38,7 @@ namespace ServerMesa
                     switch(argumentos[1])
                     {
                         case "TURNO":
+                        case "PRIV":
                             clientes.SingleOrDefault(r => ((MicrosoftWebSockets)r)._id == Convert.ToInt32(argumentos[2])).Send(message);
                             break;
                         default:

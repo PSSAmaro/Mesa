@@ -29,7 +29,7 @@
                 <ColumnDefinition Width="*"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <Image Grid.RowSpan="3" Grid.ColumnSpan="3" Grid.Row="0" Grid.Column="0" x:Name="tabuleiro" HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Top" Source="Assets/empate.png"/>
+            <Image Grid.RowSpan="3" Grid.ColumnSpan="3" Grid.Row="0" Grid.Column="0" x:Name="tabuleiro" HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Top" Source="Assets/branco.png"/>
         </Grid>
     </Grid>
 </Page>

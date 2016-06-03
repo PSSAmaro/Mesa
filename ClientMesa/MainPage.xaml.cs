@@ -34,6 +34,7 @@ namespace ClientMesa
         private DataWriter messageWriter;
         private DispatcherTimer timer;
         private int atual;
+        private bool ingame;
 
         public MainPage()
         {
@@ -88,25 +89,26 @@ namespace ClientMesa
                     switch (argumentos[1])
                     {
                         case "NOVO":
-                            int nm = jogadores.Count + 1;
-                            jogadores.Add(new Jogador("a", nm, nm%2, Convert.ToInt32(argumentos[2])));
-                            enviarMensagem("M,JGDRS," + nm);
-                            if (j != null && jogadores.Count >= j.NumJogadores)
+                            if (!ingame)
                             {
-                                j.Inicio();
-                                enviarMensagem("M,COMECA," + j.Id);
-                                atual = 0;
-                                enviarMensagem("M,TURNO," + jogadores[0].Id);
+                                int nm = jogadores.Count + 1;
+                                jogadores.Add(new Jogador("a", nm, jogadores.Count % 2 + 1, Convert.ToInt32(argumentos[2])));
+                                EnviarMensagem("M,JGDRS," + nm);
+                                VerificaInicio();
                             }
                             break;
                         case "JOGO":
-                            switch (Convert.ToInt32(argumentos[2]))
+                            if (j == null)
                             {
-                                case 1:
-                                    j = new Galo(tabuleiro, tab);
-                                    break;
-                                case 2:
-                                    break;
+                                switch (Convert.ToInt32(argumentos[2]))
+                                {
+                                    case 1:
+                                        j = new Galo(tabuleiro, tab, messageWriter);
+                                        break;
+                                    case 2:
+                                        break;
+                                }
+                                VerificaInicio();
                             }
                             break;
                         case "TURNO":
@@ -117,17 +119,18 @@ namespace ClientMesa
                                     if (j.VerificarFim())
                                     {
                                         j.Fim();
-                                        enviarMensagem("M,FIM");
+                                        EnviarMensagem("M,FIM");
+                                        ingame = false;
                                     }
                                     else
                                     {
                                         atual = (atual + 1) % j.NumJogadores;
-                                        enviarMensagem("M,TURNO," + jogadores[atual].Id);
+                                        EnviarMensagem("M,TURNO," + jogadores[atual].Id);
                                     }
                                 }
                                 else
                                 {
-                                    enviarMensagem("M,TURNO," + jogadores[atual].Id);
+                                    EnviarMensagem("M,TURNO," + jogadores[atual].Id);
                                 }
                             }
                             break;
@@ -136,7 +139,19 @@ namespace ClientMesa
             }
         }
 
-        private async void enviarMensagem(string msg)
+        private void VerificaInicio()
+        {
+            if (j != null && jogadores.Count >= j.NumJogadores)
+            {
+                j.Inicio();
+                EnviarMensagem("M,COMECA," + j.Id);
+                atual = 0;
+                EnviarMensagem("M,TURNO," + jogadores[0].Id);
+                ingame = true;
+            }
+        }
+
+        private async void EnviarMensagem(string msg)
         {
             messageWriter.WriteString(msg);
             await messageWriter.StoreAsync();

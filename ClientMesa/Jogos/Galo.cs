@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
@@ -14,7 +15,7 @@ namespace ClientMesa.Jogos
     {
         private Jogador[,] usado;
 
-        public Galo(Image t, Grid g)
+        public Galo(Image t, Grid g, DataWriter m)
         {
             Id = 1;
             Nome = "Jogo do galo";
@@ -37,38 +38,50 @@ namespace ClientMesa.Jogos
             PecasColocadas = new List<Image>();
 
             usado = new Jogador[3,3];
+
+            MessageWriter = m;
         }
 
         public override void Inicio()
         {
-            Tabuleiro.Source = new BitmapImage(new Uri("ms-appx:///Assets/galo.png"));
+            var ignore = Tabuleiro.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            {
+                Tabuleiro.Source = new BitmapImage(new Uri("ms-appx:///Assets/galo.png"));
+            });
         }
 
         public override bool Turno(Jogador j, int i)
         {
-            int x = i%3;
-            int y = i/3;
-            if (usado[x, y] == null)
+            if (i >= 0 && i <= 8)
             {
-                ColocarPeca(Pecas[j.Equipa - 1], x, y);
-                usado[x, y] = j;
-                TurnoAtual++;
-                return true;
+                int x = i % 3;
+                int y = i / 3;
+                if (usado[x, y] == null)
+                {
+                    ColocarPeca(Pecas[j.Equipa - 1], x, y);
+                    usado[x, y] = j;
+                    Informar("M,INF," + j.Equipa + "," + i);
+                    TurnoAtual++;
+                    return true;
+                }
             }
             return false;
         }
 
         private void ColocarPeca(Peca p, int x, int y)
         {
-            Image pc = new Image
+            var ignore = Tabela.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                Source = new BitmapImage(p.Imagem),
-                Margin = MargemPecas
-            };
-            Tabela.Children.Add(pc);
-            Grid.SetRow(pc, y);
-            Grid.SetColumn(pc, x);
-            PecasColocadas.Add(pc);
+                Image pc = new Image
+                {
+                    Source = new BitmapImage(p.Imagem),
+                    Margin = MargemPecas
+                };
+                Tabela.Children.Add(pc);
+                Grid.SetRow(pc, y);
+                Grid.SetColumn(pc, x);
+                PecasColocadas.Add(pc);
+            });
         }
 
         public override bool VerificarFim()
@@ -101,22 +114,34 @@ namespace ClientMesa.Jogos
 
         public override void Fim()
         {
-            PecasColocadas.ForEach(delegate (Image pc)
+            var ignore = Tabela.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                Tabela.Children.Remove(pc);
+                PecasColocadas.ForEach(delegate (Image pc)
+                {
+                    Tabela.Children.Remove(pc);
+                });
             });
-            switch (Vencedor)
+            var ignore2 = Tabuleiro.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                case 0:
-                    Tabuleiro.Source = new BitmapImage(new Uri("ms-appx:///Assets/empate.png"));
-                    break;
-                case 1:
-                    Tabuleiro.Source = new BitmapImage(new Uri("ms-appx:///Assets/vermelha.png"));
-                    break;
-                case 2:
-                    Tabuleiro.Source = new BitmapImage(new Uri("ms-appx:///Assets/preta.png"));
-                    break;
-            }
+                switch (Vencedor)
+                {
+                    case 0:
+                        Tabuleiro.Source = new BitmapImage(new Uri("ms-appx:///Assets/empate.png"));
+                        break;
+                    case 1:
+                        Tabuleiro.Source = new BitmapImage(new Uri("ms-appx:///Assets/vermelha.png"));
+                        break;
+                    case 2:
+                        Tabuleiro.Source = new BitmapImage(new Uri("ms-appx:///Assets/preta.png"));
+                        break;
+                }
+            });
+        }
+
+        public override async void Informar(string msg)
+        {
+            MessageWriter.WriteString(msg);
+            await MessageWriter.StoreAsync();
         }
     }
 }

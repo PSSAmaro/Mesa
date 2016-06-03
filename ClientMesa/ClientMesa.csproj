@@ -114,6 +114,7 @@
     <None Include="ClientMesa_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\branco.png" />
     <Content Include="Assets\empate.png" />
     <Content Include="Assets\galo.png" />
     <Content Include="Assets\o.png" />
