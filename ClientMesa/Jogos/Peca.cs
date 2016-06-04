@@ -12,13 +12,15 @@ namespace ClientMesa.Jogos
         public string Classe { get; set; }
         public int Pontos { get; set; }
         public Uri Imagem { get; set; }
+        public int Id { get; set; }
 
-        public Peca(string n, string c, int p, string i)
+        public Peca(string n, string c, int p, string i, int id)
         {
             Nome = n;
             Classe = c;
             Pontos = p;
             Imagem = new Uri("ms-appx:///Assets/" + i + ".png");
+            Id = id;
         }
     }
 }

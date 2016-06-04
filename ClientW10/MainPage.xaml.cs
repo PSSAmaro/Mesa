@@ -87,6 +87,7 @@ namespace ClientW10
             LimparImagens();
             tabuleiro.Source = new BitmapImage(new Uri("ms-appx:///Assets/branco.png"));
             ColocarImagem(new Uri("ms-appx:///Assets/galo.png"), 0, 0);
+            ColocarImagem(new Uri("ms-appx:///Assets/cartas/A_Espadas.png"), 1, 0);
         }
 
         private void NovaMensagem(MessageWebSocket sender, MessageWebSocketMessageReceivedEventArgs args)
@@ -107,7 +108,6 @@ namespace ClientW10
                             case "COMECA":
                                 inGame = true;
                                 jogo = Convert.ToInt32(argumentos[2]) - 1;
-                                tabuleiro.Source = posPecas[jogo].Source;
                                 LimparImagens();
                                 if (jogo == 0)
                                 {
@@ -119,6 +119,36 @@ namespace ClientW10
                                     };
                                     for (int b = 0; b < 9; b++)
                                         ColocarImagem(new Uri("ms-appx:///Assets/galo/" + b + ".png"), b, 1);
+                                    tabuleiro.Source = new BitmapImage(new Uri("ms-appx:///Assets/galo.png"));
+                                }
+                                else if (jogo == 1)
+                                {
+                                    string[] naipes = new string[4]
+                                    {
+                                        "Copas",
+                                        "Espadas",
+                                        "Ouros",
+                                        "Paus"
+                                    };
+
+                                    pecas = new List<Uri>();
+
+                                    for (int z = 0; z <= 3; z++)
+                                    {
+                                        for (int y = 2; y <= 6; y++)
+                                            pecas.Add(new Uri("ms-appx:///Assets/cartas/" + y + "_" + naipes[z] + ".png"));
+                                        pecas.Add(new Uri("ms-appx:///Assets/cartas/Q_" + naipes[z] + ".png"));
+                                        pecas.Add(new Uri("ms-appx:///Assets/cartas/J_" + naipes[z] + ".png"));
+                                        pecas.Add(new Uri("ms-appx:///Assets/cartas/K_" + naipes[z] + ".png"));
+                                        pecas.Add(new Uri("ms-appx:///Assets/cartas/7_" + naipes[z] + ".png"));
+                                        pecas.Add(new Uri("ms-appx:///Assets/cartas/A_" + naipes[z] + ".png"));
+                                    }
+                                    pecas.Add(new Uri("ms-appx:///Assets/cartas/mesa.png"));
+                                    pecas.Add(new Uri("ms-appx:///Assets/1.png"));
+                                    pecas.Add(new Uri("ms-appx:///Assets/2.png"));
+                                    pecas.Add(new Uri("ms-appx:///Assets/3.png"));
+                                    pecas.Add(new Uri("ms-appx:///Assets/4.png"));
+                                    tabuleiro.Source = new BitmapImage(new Uri("ms-appx:///Assets/branco.png"));
                                 }
                                 break;
                             case "TURNO":
@@ -134,6 +164,13 @@ namespace ClientW10
                                 RetirarImagem(j);
                                 if (i > 0)
                                     ColocarImagem(pecas[i - 1], j, 2);
+                                break;
+                            case "PRIV":
+                                int v = Convert.ToInt32(argumentos[3]);
+                                int w = Convert.ToInt32(argumentos[4]);
+                                RetirarImagem(w);
+                                if (v > 0)
+                                    ColocarImagem(pecas[v - 1], w, 1);
                                 break;
                         }
                     });

@@ -56,23 +56,9 @@ namespace ClientMesa
             timer.Start();*/
             await messageWebSocket.ConnectAsync(new Uri("ws://servermesa.azurewebsites.net/ws.ashx?tipo=MESA"));
             messageWriter = new DataWriter(messageWebSocket.OutputStream);
-        }
 
-        private void fazCenas(object sender, object e)
-        {
-            jogadores.Add(new Jogador("a", 2, 1, 1));
-            jogadores.Add(new Jogador("a", 2, 2, 2));
-            j.Turno(jogadores[0], 1);
-            j.Turno(jogadores[0], 2);
-            j.Turno(jogadores[0], 3);
-            j.Turno(jogadores[0], 4);
-            //j.Turno(jogadores[0], 8);
-            j.Turno(jogadores[1], 0);
-            j.Turno(jogadores[1], 5);
-            j.Turno(jogadores[1], 6);
-            j.Turno(jogadores[1], 7);
-            if (j.VerificarFim())
-                j.Fim();
+            /*j = new Bisca(tabuleiro, tab, messageWriter);
+            j.Inicio(jogadores);*/
         }
 
         private void NovaMensagem(MessageWebSocket sender, MessageWebSocketMessageReceivedEventArgs args)
@@ -86,55 +72,55 @@ namespace ClientMesa
 
                 if (argumentos[0] == "J")
                 {
-                    switch (argumentos[1])
+                    var ignore = tab.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                     {
-                        case "NOVO":
-                            if (!ingame)
-                            {
-                                int nm = jogadores.Count + 1;
-                                jogadores.Add(new Jogador("a", nm, jogadores.Count % 2 + 1, Convert.ToInt32(argumentos[2])));
-                                EnviarMensagem("M,JGDRS," + nm);
-                                VerificaInicio();
-                            }
-                            break;
-                        case "JOGO":
-                            if (j == null)
-                            {
-                                switch (Convert.ToInt32(argumentos[2]))
+                        switch (argumentos[1])
+                        {
+                            case "NOVO":
+                                if (!ingame)
                                 {
-                                    case 1:
-                                        j = new Galo(tabuleiro, tab, messageWriter);
-                                        break;
-                                    case 2:
-                                        break;
+                                    int nm = jogadores.Count + 1;
+                                    jogadores.Add(new Jogador("a", nm, jogadores.Count % 2 + 1, Convert.ToInt32(argumentos[2])));
+                                    EnviarMensagem("M,JGDRS," + nm);
+                                    VerificaInicio();
                                 }
-                                VerificaInicio();
-                            }
-                            break;
-                        case "TURNO":
-                            if (Convert.ToInt32(argumentos[2]) == jogadores[atual].Id)
-                            {
-                                if (j.Turno(jogadores[atual], Convert.ToInt32(argumentos[3])))
+                                break;
+                            case "JOGO":
+                                if (j == null)
                                 {
-                                    if (j.VerificarFim())
+                                    switch (Convert.ToInt32(argumentos[2]))
                                     {
-                                        j.Fim();
-                                        EnviarMensagem("M,FIM");
-                                        ingame = false;
+                                        case 1:
+                                            j = new Galo(tabuleiro, tab, messageWriter);
+                                            break;
+                                        case 2:
+                                            j = new Bisca(tabuleiro, tab, messageWriter);
+                                            break;
+                                    }
+                                    VerificaInicio();
+                                }
+                                break;
+                            case "TURNO":
+                                if (Convert.ToInt32(argumentos[2]) == jogadores[j.Proximo].Id)
+                                {
+                                    if (j.Turno(jogadores[j.Proximo].Numero - 1, Convert.ToInt32(argumentos[3])))
+                                    {
+                                        if (j.VerificarFim())
+                                        {
+                                            j.Fim();
+                                            EnviarMensagem("M,FIM");
+                                            ingame = false;
+                                            j = null;
+                                        }
+                                        else
+                                            EnviarMensagem("M,TURNO," + jogadores[j.Proximo].Id);
                                     }
                                     else
-                                    {
-                                        atual = (atual + 1) % j.NumJogadores;
-                                        EnviarMensagem("M,TURNO," + jogadores[atual].Id);
-                                    }
+                                        EnviarMensagem("M,TURNO," + jogadores[j.Proximo].Id);
                                 }
-                                else
-                                {
-                                    EnviarMensagem("M,TURNO," + jogadores[atual].Id);
-                                }
-                            }
-                            break;
-                    }
+                                break;
+                        }
+                    });
                 }
             }
         }
@@ -143,10 +129,9 @@ namespace ClientMesa
         {
             if (j != null && jogadores.Count >= j.NumJogadores)
             {
-                j.Inicio();
                 EnviarMensagem("M,COMECA," + j.Id);
-                atual = 0;
-                EnviarMensagem("M,TURNO," + jogadores[0].Id);
+                j.Inicio(jogadores);
+                EnviarMensagem("M,TURNO," + jogadores[j.Proximo].Id);
                 ingame = true;
             }
         }
